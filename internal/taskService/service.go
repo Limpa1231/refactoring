@@ -1,8 +1,6 @@
 package taskService
 
-import (
-	"firstRest/orm"
-)
+import "firstRest/orm"
 
 type TaskService struct {
 	repo MessageRepository
