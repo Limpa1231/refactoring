@@ -1,9 +1,9 @@
 package database
 
 import (
+	"firstRest/orm"
 	"log"
 
-	"firstRest/orm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
