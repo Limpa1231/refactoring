@@ -19,10 +19,10 @@ func main() {
 	taskHandler := handlers.NewTaskHandler(taskSvc)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/addTask", taskHandler.AddTaskHandler).Methods("POST")
-	router.HandleFunc("/showTasks", taskHandler.ShowTasksHandler).Methods("GET")
-	router.HandleFunc("/updateTask/{id}", taskHandler.UpdateTaskHandler).Methods("PUT")
-	router.HandleFunc("/deleteTask/{id}", taskHandler.DeleteTaskHandler).Methods("DELETE")
+	router.HandleFunc("/api/tasks", taskHandler.AddTaskHandler).Methods("POST")
+	router.HandleFunc("/api/tasks", taskHandler.ShowTasksHandler).Methods("GET")
+	router.HandleFunc("/api/tasks/{id}", taskHandler.UpdateTaskHandler).Methods("PUT")
+	router.HandleFunc("/api/tasks/{id}", taskHandler.DeleteTaskHandler).Methods("DELETE")
 
 	log.Println("Server started at localhost:8080")
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
