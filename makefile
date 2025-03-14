@@ -18,4 +18,13 @@ migrate-down:
 
 # для удобства добавим команду run, которая будет запускать наше приложение
 run:
-	go run cmd/app/main.go # Теперь при вызове make run мы запустим наш серв make --versionер
+	go run cmd/app/main.go # Теперь при вызове make run мы запустим наш серв make --versionе
+
+gen:
+	oapi-codegen -config openapi/.openapi -include-tags tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+
+lint:
+	golangci-lint run --out-format=colored-line-number
+
+gen-users:
+	oapi-codegen -config openapi/.openapi -include-tags users -package users openapi/openapi.yaml > ./internal/web/users/api.gen.go

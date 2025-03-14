@@ -1,15 +1,15 @@
 package taskService
 
 import (
+	"firstRest/internal/models"
 	"firstRest/internal/database"
-	"firstRest/orm"
 	"gorm.io/gorm"
 )
 
 type MessageRepository interface {
-	AddTaskHandler(task orm.Message) (*orm.Message, error)
-	ShowTasksHandler() ([]orm.Message, error)
-	UpdateTaskHandler(id uint, updatedMessage orm.Message) (*orm.Message, error)
+	AddTaskHandler(task models.Message) (*models.Message, error)
+	ShowTasksHandler() ([]models.Message, error)
+	UpdateTaskHandler(id uint, updatedMessage models.Message) (*models.Message, error)
 	DeleteTaskHandler(id uint) error
 }
 
@@ -21,7 +21,7 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 	return &TaskRepository{db: db}
 }
 
-func (r *TaskRepository) AddTaskHandler(task orm.Message) (*orm.Message, error) {
+func (r *TaskRepository) AddTaskHandler(task models.Message) (*models.Message, error) {
 	result := r.db.Create(&task)
 	if result.Error != nil {
 		return nil, result.Error
@@ -29,8 +29,8 @@ func (r *TaskRepository) AddTaskHandler(task orm.Message) (*orm.Message, error) 
 	return &task, nil
 }
 
-func (r *TaskRepository) ShowTasksHandler() ([]orm.Message, error) {
-	var messages []orm.Message
+func (r *TaskRepository) ShowTasksHandler() ([]models.Message, error) {
+	var messages []models.Message
 	result := database.DB.Find(&messages)
 	if result.Error != nil {
 		return nil, result.Error
@@ -39,8 +39,8 @@ func (r *TaskRepository) ShowTasksHandler() ([]orm.Message, error) {
 	return messages, nil
 }
 
-func (r *TaskRepository) UpdateTaskHandler(id uint, updatedMessage orm.Message) (*orm.Message, error) {
-	var message orm.Message
+func (r *TaskRepository) UpdateTaskHandler(id uint, updatedMessage models.Message) (*models.Message, error) {
+	var message models.Message
 	result := database.DB.First(&message, id)
 	if result.Error != nil {
 		return nil, result.Error
@@ -58,7 +58,7 @@ func (r *TaskRepository) UpdateTaskHandler(id uint, updatedMessage orm.Message) 
 }
 
 func (r *TaskRepository) DeleteTaskHandler(id uint) error {
-	var message orm.Message
+	var message models.Message
 	result := database.DB.Unscoped().First(&message, id)
 	if result.Error != nil {
 		return result.Error

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"firstRest/orm"
+	"firstRest/internal/models"
 	"log"
 
 	"gorm.io/driver/postgres"
@@ -11,11 +11,16 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
-	dsn := "host=localhost user=postgres password=root dbname=fark port=5432 sslmode=disable"
+	dsn := "host=localhost user=postgres dbname=fark sslmode=disable password=root"
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database: ", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	DB.AutoMigrate(&orm.Message{})
+
+	// Автомиграция схемы
+	err = DB.AutoMigrate(&models.Message{}, &models.User{}) // Добавьте &models.User{}
+	if err != nil {
+		log.Fatalf("Failed to auto migrate: %v", err)
+	}
 }
