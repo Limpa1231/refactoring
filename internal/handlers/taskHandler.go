@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"context"
-	"firstRest/internal/taskService"
+	"firstRest/internal/database"
 	"firstRest/internal/models"
+	"firstRest/internal/taskService"
 	"firstRest/internal/web/tasks"
 	"fmt"
 	"net/http"
@@ -32,7 +33,9 @@ func NewTaskHandler(service *taskService.TaskService) *Handler {
 
 func (h *Handler) AddTaskHandler(c echo.Context) error {
 	var requestBody struct {
-		Message string `json:"message"`
+		Task   string `json:"Task"`
+		IsDone bool   `json:"Is_done"`
+		UserID uint   `json:"User_Id"`
 	}
 
 	// Парсим JSON из тела запроса
@@ -40,8 +43,8 @@ func (h *Handler) AddTaskHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка при разборе JSON: %v", err)})
 	}
 
-	// Добавляем задачу через сервис
-	task, err := h.service.AddTask(requestBody.Message)
+	// Создаем задачу через сервис
+	task, err := h.service.AddTask(requestBody.Task, requestBody.IsDone, requestBody.UserID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Не удалось сохранить задачу"})
 	}
@@ -61,6 +64,25 @@ func (h *Handler) ShowTasksHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, tasks)
 }
 
+func (h *Handler) GetTasksByUserID(c echo.Context) error {
+	// Получаем user_id из параметров пути
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Неверный user_id"})
+	}
+
+	// Получаем задачи через сервис
+	tasks, err := h.service.GetTasksByUserID(uint(userID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Не удалось получить задачи"})
+	}
+
+	// Возвращаем список задач
+	return c.JSON(http.StatusOK, tasks)
+}
+
+// GetTasks implements tasks.StrictServerInterface.
+
 func (h *Handler) UpdateTaskHandler(c echo.Context) error {
 	// Получаем ID задачи из параметров пути
 	id, err := strconv.Atoi(c.Param("id"))
@@ -69,12 +91,27 @@ func (h *Handler) UpdateTaskHandler(c echo.Context) error {
 	}
 
 	// Парсим JSON из тела запроса
-	var updatedTask models.Message
-	if err := c.Bind(&updatedTask); err != nil {
+	var requestBody struct {
+		Task   string `json:"task"`
+		IsDone bool   `json:"is_done"`
+		UserID uint   `json:"user_id"`
+	}
+	if err := c.Bind(&requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Ошибка при разборе JSON: %v", err)})
 	}
 
+	// Проверяем, существует ли пользователь с указанным UserID
+	var user models.User
+	if err := database.DB.First(&user, requestBody.UserID).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Пользователь с ID %d не найден", requestBody.UserID)})
+	}
+
 	// Обновляем задачу через сервис
+	updatedTask := models.Message{
+		Task:   requestBody.Task,
+		IsDone: requestBody.IsDone,
+		UserID: requestBody.UserID,
+	}
 	task, err := h.service.UpdateTask(uint(id), updatedTask)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Не удалось обновить задачу"})

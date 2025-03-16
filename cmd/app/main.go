@@ -41,6 +41,7 @@ func main() {
 	users.RegisterHandlers(e, usersStrictHandler)
 
 	e.POST("/api/tasks", taskHandler.AddTaskHandler)
+	e.GET("/api/tasks/user/:user_id", taskHandler.GetTasksByUserID)
 	e.GET("/api/tasks", taskHandler.ShowTasksHandler)
 	e.PUT("/api/tasks/:id", taskHandler.UpdateTaskHandler)
 	e.DELETE("/api/tasks/:id", taskHandler.DeleteTaskHandler)

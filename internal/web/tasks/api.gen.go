@@ -15,9 +15,17 @@ import (
 
 // Task defines model for Task.
 type Task struct {
-	Id     *uint   `json:"id,omitempty"`
-	IsDone *bool   `json:"is_done,omitempty"`
-	Title  *string `json:"title,omitempty"`
+	// Id The task ID
+	Id *int64 `json:"id,omitempty"`
+
+	// IsDone Indicates whether the task is completed
+	IsDone bool `json:"is_done"`
+
+	// Title The title of the task
+	Title string `json:"title"`
+
+	// UserId The ID of the user who owns the task
+	UserId int64 `json:"user_id"`
 }
 
 // PostTasksJSONRequestBody defines body for PostTasks for application/json ContentType.

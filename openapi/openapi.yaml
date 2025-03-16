@@ -163,9 +163,14 @@ components:
         is_done:
           type: boolean
           description: Indicates whether the task is completed
+        user_id:
+          type: integer
+          format: int64
+          description: The ID of the user who owns the task
       required:
         - title
         - is_done
+        - user_id
 
     User:
       type: object

@@ -19,7 +19,7 @@ func InitDB() {
 	}
 
 	// Автомиграция схемы
-	err = DB.AutoMigrate(&models.Message{}, &models.User{}) // Добавьте &models.User{}
+	err = DB.AutoMigrate(&models.User{}, &models.Message{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate: %v", err)
 	}
